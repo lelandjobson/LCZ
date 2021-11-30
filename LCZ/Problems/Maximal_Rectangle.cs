@@ -25,44 +25,71 @@ namespace LeetCode.Problems
                 new List<int>{ 1,1,1,1,1 },
                 new List<int>{ 1,0,0,1,0 }
             };
-            var testMatrixMax = MaxRectangleArea(testMatrix.Select(m => m.ToArray()).ToArray());
+            var testMatrixMax = MaximalRectangle(testMatrix.Select(m => m.Select( i => i.ToString()[0]).ToArray()).ToArray());
         }
 
-        public int MaxRectangleArea(int[][] matrix)
+        private int LargestRectangleArea(int[] heights)
         {
-            if(matrix == null || matrix.Length == 0) { return 0; }
-
-            int n = matrix[0].Length;
-            int[] height = new int[n + 1];
-            int answer = 0;
-
-            for(int x = 0; x<matrix.Length; x++)
+            if (heights.Length == 0)
             {
-                for(int y = 0; y< n; y++)
+                return 0;
+            }
+
+            if (heights.Length == 1)
+            {
+                return heights[0];
+            }
+
+            int res = heights[0];
+            Stack<int> indices = new Stack<int>();
+            for (int i = 0; i < heights.Length; i++)
+            {
+                while (indices.Count > 0 && heights[indices.Peek()] >= heights[i])
                 {
-                    if(matrix[x][y] == 1)
+                    var pop = indices.Pop();
+                    var leftMost = indices.Count > 0 ? indices.Peek() + 1 : 0;
+                    res = Math.Max(res, heights[pop] * (i - leftMost));
+                }
+                indices.Push(i);
+            }
+
+            while (indices.Count > 0)
+            {
+                var pop = indices.Pop();
+                var leftMost = indices.Count > 0 ? indices.Peek() + 1 : 0;
+                res = Math.Max(res, heights[pop] * (heights.Length - leftMost));
+            }
+            return res;
+        }
+
+        public int MaximalRectangle(char[][] matrix)
+        {
+            if (matrix.Length == 0)
+            {
+                return 0;
+            }
+
+            int res = 0;
+
+            int[] heights = new int[matrix[0].Length];
+
+            for (int i = 0; i < matrix.Length; i++)
+            {
+                for (int j = 0; j < matrix[i].Length; j++)
+                {
+                    if (matrix[i][j] == '0')
                     {
-                        height[y] += 1; 
+                        heights[j] = 0;
                     }
                     else
                     {
-                        height[y] += 0;
+                        heights[j]++;
                     }
                 }
-
-                Stack<int> stack = new Stack<int>();
-                for(int y = 0; y<n +1; y++)
-                {
-                    while(height[y] < height[stack.Peek()])
-                    {
-                        var h = stack.Pop();
-                        var w = y - 1 - stack.Peek();
-                        answer = Math.Max(answer, h * w);
-                    }
-                    stack.Push(y);
-                }
+                res = Math.Max(res, LargestRectangleArea(heights));
             }
-            return answer;
+
+            return res;
         }
     }
 }

@@ -19,39 +19,42 @@ namespace LeetCode.Problems
 
         public void Execute()
         {
-            var test1 = new int[] { 2, 1, 5, 6, 2, 3 };
+            //var test1 = new int[] { 2, 1, 5, 6, 2, 3 };
+            var test1 = new int[] { 2, 4 };
             Assert.AreEqual(10, LargestRectangleArea(test1));
         }
+
         public int LargestRectangleArea(int[] heights)
         {
-            Stack<int> stack = new Stack<int>();
-            stack.Push(-1);
-            int length = heights.Length;
-            int maxArea = 0;
+            if(heights == null) { return 0; }
+            if(heights.Length == 1) { return heights[0]; }
 
-            // In this one, we only recalculate
-            // when we get to the bottom of the stack,
-            // or when we have a block that is smaller
-            // than the next block.
-            for (int i = 0; i < length; i++)
+            Stack<int> indices = new Stack<int>();
+
+            int result = 0;
+
+            for(int i =0; i<heights.Length + 1; i++)
             {
-                while ((stack.Peek() != -1)
-                        && (heights[stack.Peek()] >= heights[i]))
+                int curHeight = i == heights.Length ? 0 : heights[i];
+                while (PreviousBarOnStackIsGreaterThan(indices, heights, curHeight))
                 {
-                    int currentHeight = heights[stack.Pop()];
-                    int currentWidth = i - stack.Peek() - 1;
-                    maxArea = Math.Max(maxArea, currentHeight * currentWidth);
+                    var pop = indices.Pop();
+                    var leftMost = indices.Count == 0 ? 0 : indices.Peek() + 1;
+                    var rightMost = i;
+                    result = Math.Max(result, (rightMost - leftMost) * heights[pop]);
                 }
-                stack.Push(i);
+                indices.Push(i);
             }
-            // In this one... i dont know lol
-            while (stack.Peek() != -1)
-            {
-                int currentHeight = heights[stack.Pop()];
-                int currentWidth = length - stack.Peek() - 1;
-                maxArea = Math.Max(maxArea, currentHeight * currentWidth);
-            }
-            return maxArea;
+
+            return result;
         }
+
+        bool PreviousBarOnStackIsGreaterThan(Stack<int> stack, int[] heights, int next)
+        {
+            return stack.Count > 0 && heights[stack.Peek()] > next;
+        }
+
+
+     
     }
 }

@@ -22,9 +22,9 @@ namespace LeetCode
             //var test = new Cherry_Pickup_II();
             //var test = new Playground();
             //var test = new Graph_Cycle_Detection();
-            //var test = new Largest_Rectangle_Area();
+            var test = new Largest_Rectangle_Area();
 
-            var test = new Maximal_Rectangle();
+            //var test = new Maximal_Rectangle();
 
 
             test.Execute();
